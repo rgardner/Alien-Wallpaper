@@ -36,6 +36,7 @@ SUBREDDITS.each do |subreddit|
     filename = post["data"]["id"] +
                post["data"]["url"].match(FILE_EXTENSION_REGEX)[0]
     filepath = File.join(OUTPUT_DIR, filename)
+    puts filepath
     File.open(filepath, "wb") do |fo|
       fo.write open(post["data"]["url"]).read
     end
