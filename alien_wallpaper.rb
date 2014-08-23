@@ -1,56 +1,45 @@
 #!/usr/bin/env ruby
 
-# Name: downloader.rb
+# Name: alien_wallpaper.rb
 # Description: Downloads top 25 images from specified subreddits.
 # Author: Bob Gardner
-# Updated: 4/9/14
+# Updated: 8/23/14
 # License: MIT
 
 require 'open-uri'
 require 'snoo'
-require 'yaml'
-
-CONFIG     = YAML.load_file(File.expand_path('../config/preferences.yaml',
-                                             __FILE__))
-LOGIN_INFO = YAML.load_file(File.expand_path('../config/reddit_account.yaml',
-                                             __FILE__))
-# The directory to download images to
-OUTPUT_DIR = Dir.new(CONFIG['output_dir'])
-
-# Supported file types
-FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
+require 'trollop'
 
 # The subreddits to download images from.
 SUBREDDITS = %w(ArchitecturePorn CityPorn EarthPorn SkyPorn spaceporn
                 winterporn quoteporn)
 
-# Download images from Reddit
-class Downloader
-  attr_accessor :reddit
+# Supported file types.
+FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
 
-  # Returns a reddit client
-  def create_client
-    @reddit = Snoo::Client.new
-    @reddit.log_in(LOGIN_INFO['username'], LOGIN_INFO['password'])
+
+class Client
+  attr_accessor :client
+
+  # Initialize and log in the client.
+  def initialize(username, password)
+    @client = Snoo::Client.new
+    @client.log_in(username, password)
   end
 
-  # Returns a post Hash
+  # Returns a post hash.
   def get_posts(subreddit)
     opts = { subreddit: "#{subreddit}", page: 'new', limit: 25 }
-    listing = @reddit.get_listing(opts)
+    listing = @client.get_listing(opts)
     listing['data']['children']
   end
+end
 
-  # Save the invalid url to invalid-urls.log
-  def log_invalid_url(url)
-    File.open('invalid-urls.log', 'a') do |log|
-      log.write("#{url}\n")
-    end
-  end
+class Post
 
   # Skip nil and self posts, log unsupported urls, and save valid, supported
-  # images
-  def process_post(post)
+  #   images.
+  def self.process_post(post, output_dir)
     # Skip nil and self posts
     return if post.nil?
     return if post['data']['domain'].start_with?('self')
@@ -61,14 +50,16 @@ class Downloader
       return
     end
 
-    download_image(post)
+    download_image(post, output_dir)
   end
 
-  def download_image(post)
+  private
+
+  def self.download_image(post, output_dir)
     # Construct the filename and filepath
     filename = post['data']['id'] +
                post['data']['url'].match(FILE_EXTENSION_REGEX)[0]
-    filepath = File.join(OUTPUT_DIR, filename)
+    filepath = File.join(output_dir, filename)
     puts filepath
 
     # Need to use write-binary (wb) mode for images
@@ -77,19 +68,31 @@ class Downloader
     end
   end
 
-  def main
-    create_client
-    SUBREDDITS.each do |subreddit|
-      posts = get_posts(subreddit)
-      posts.each { |post| process_post(post) }
+  # Save the invalid url to invalid-urls.log
+  def self.log_invalid_url(url)
+    File.open('invalid-urls.log', 'a') do |log|
+      log.write("#{url}\n")
     end
   end
 end
 
-if __FILE__ == $PROGRAM_NAME
-  x = Downloader.new
-  x.main
+def main
+  opts = Trollop.options do
+    banner 'Download Wallpaper from Subreddits'
+    opt :username, 'Your Reddit username', type: :string
+    opt :password, 'Your Reddit password', type: :string
+    opt :out,      'Directory to save wallpaper to', type: :string
+  end
+
+  client = Client.new(opts[:username], opts[:password])
+
+  SUBREDDITS.each do |subreddit|
+    posts = client.get_posts(subreddit)
+    posts.each { |post| Post.process_post(post, opts[:out]) }
+  end
 end
+
+main
 
 # def handle_flickr(href)
 #   unless href.index('/sizes')
