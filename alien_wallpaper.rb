@@ -11,8 +11,8 @@ require 'snoo'
 require 'trollop'
 
 # The subreddits to download images from.
-SUBREDDITS = %w(ArchitecturePorn CityPorn EarthPorn SkyPorn spaceporn
-                winterporn quoteporn)
+DEFAULT_SUBREDDITS = %w(ArchitecturePorn CityPorn EarthPorn SkyPorn spaceporn
+                        winterporn quoteporn)
 
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
@@ -79,14 +79,22 @@ end
 def main
   opts = Trollop.options do
     banner 'Download Wallpaper from Subreddits'
-    opt :username, 'Your Reddit username', type: :string
+    opt :n,       'Number of images to download for each subreddit', type: :int
+    opt :out,     'Directory to save wallpaper to', type: :string
     opt :password, 'Your Reddit password', type: :string
-    opt :out,      'Directory to save wallpaper to', type: :string
+    opt :subreddits, 'Comma separated subreddits to download images from',
+         type: :string
+    opt :username,   'Your Reddit username', type: :string
   end
 
+  if opts[:subreddits]
+    subreddits = opts[:subreddits].split(',')
+  else
+    subreddits = DEFAULT_SUBREDDITS
+  end
   client = Client.new(opts[:username], opts[:password])
 
-  SUBREDDITS.each do |subreddit|
+  subreddits.each do |subreddit|
     posts = client.get_posts(subreddit)
     posts.each { |post| Post.process_post(post, opts[:out]) }
   end
