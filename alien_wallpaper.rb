@@ -51,7 +51,7 @@ class Post
 
     # Log unsupported file types
     unless post['data']['url'].match(FILE_EXTENSION_REGEX)
-      log_invalid_url(post['data']['url'])
+      $stderr.puts post['data']['url']
       return
     end
 
@@ -70,13 +70,6 @@ class Post
     # Need to use write-binary (wb) mode for images
     File.open(filepath, 'wb') do |f|
       f << open(post['data']['url']).read
-    end
-  end
-
-  # Save the invalid url to invalid-urls.log
-  def self.log_invalid_url(url)
-    File.open('invalid-urls.log', 'a') do |log|
-      log.write("#{url}\n")
     end
   end
 end
