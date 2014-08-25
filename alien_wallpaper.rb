@@ -6,13 +6,12 @@
 # Updated: 8/23/14
 # License: MIT
 
-require 'open-uri'
 require 'snoo'
 require 'trollop'
 
 # The subreddits to download images from.
-DEFAULT_SUBREDDITS = %w(ArchitecturePorn CityPorn EarthPorn SkyPorn spaceporn
-                        winterporn quoteporn)
+DEFAULT_SUBREDDITS = 'ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,' \
+                     'winterporn,quoteporn'
 
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
@@ -24,12 +23,12 @@ class Client
   # Initialize and log in the client.
   def initialize(username, password)
     @client = Snoo::Client.new
-    @client.log_in(username, password)
+    @client.log_in username, password
   end
 
   # Returns a post hash.
-  def get_posts(subreddit)
-    opts = { subreddit: "#{subreddit}", page: 'new', limit: 25 }
+  def get_posts(subreddit, num_posts)
+    opts = { subreddit: "#{subreddit}", page: 'new', limit: num_posts }
     listing = @client.get_listing(opts)
     listing['data']['children']
   end
@@ -76,26 +75,24 @@ class Post
   end
 end
 
-def main
-  opts = Trollop.options do
+def get_opts
+  Trollop.options do
     banner 'Download Wallpaper from Subreddits'
-    opt :n,       'Number of images to download for each subreddit', type: :int
-    opt :out,     'Directory to save wallpaper to', type: :string
+    opt :n, 'Number of images to download for each subreddit', default: 25
+    opt :out, 'Directory to save wallpaper to', default: Dir.pwd
     opt :password, 'Your Reddit password', type: :string
-    opt :subreddits, 'Comma separated subreddits to download images from',
-         type: :string
-    opt :username,   'Your Reddit username', type: :string
+    opt :subreddits, 'Comma separated subreddits to download images from; ' \
+         'the defaults are SFW', default: DEFAULT_SUBREDDITS
+    opt :username, 'Your Reddit username', type: :string
   end
+end
 
-  if opts[:subreddits]
-    subreddits = opts[:subreddits].split(',')
-  else
-    subreddits = DEFAULT_SUBREDDITS
-  end
+def main
+  opts = get_opts
   client = Client.new(opts[:username], opts[:password])
 
-  subreddits.each do |subreddit|
-    posts = client.get_posts(subreddit)
+  opts[:subreddits].split(',').each do |subreddit|
+    posts = client.get_posts(subreddit, opts[:n])
     posts.each { |post| Post.process_post(post, opts[:out]) }
   end
 end
