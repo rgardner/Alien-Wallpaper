@@ -6,12 +6,19 @@
 # Updated: 8/23/14
 # License: MIT
 
+require 'open-uri'
 require 'snoo'
 require 'trollop'
 
-# The subreddits to download images from.
-DEFAULT_SUBREDDITS = 'ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,' \
-                     'winterporn,quoteporn'
+# The default subreddits to download images from.
+DEFAULT_SUBREDDITS = <<-EOS
+ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,winterporn,quoteporn
+EOS
+
+USER_AGENT = <<-EOS
+Alien Wallpaper: A beautiful desktop wallpaper downloader for Reddit by
+/u/Wolf_Blackout.
+EOS
 
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
@@ -21,9 +28,8 @@ class Client
   attr_accessor :client
 
   # Initialize and log in the client.
-  def initialize(username, password)
-    @client = Snoo::Client.new
-    @client.log_in username, password
+  def initialize
+    @client = Snoo::Client.new({ useragent: USER_AGENT })
   end
 
   # Returns a post hash.
@@ -80,16 +86,14 @@ def get_opts
     banner 'Download Wallpaper from Subreddits'
     opt :n, 'Number of images to download for each subreddit', default: 25
     opt :out, 'Directory to save wallpaper to', default: Dir.pwd
-    opt :password, 'Your Reddit password', type: :string
     opt :subreddits, 'Comma separated subreddits to download images from; ' \
-         'the defaults are SFW', default: DEFAULT_SUBREDDITS
-    opt :username, 'Your Reddit username', type: :string
+         'the defaults are SFW', default: DEFAULT_SUBREDDITS.strip
   end
 end
 
 def main
   opts = get_opts
-  client = Client.new(opts[:username], opts[:password])
+  client = Client.new
 
   opts[:subreddits].split(',').each do |subreddit|
     posts = client.get_posts(subreddit, opts[:n])
