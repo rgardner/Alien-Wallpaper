@@ -1,29 +1,25 @@
-Alien Downloader
-================
+# Alien Wallpaper
+Download images from Subreddits. Great for beautiful wallpaper.
 
-Download Images from Subreddits
------------------------------------------
+## Getting Started
+### Quick Setup
+```
+wget https://github.com/rgardner/Alien-Image-Downloader/blob/master/alien_wallpaper.rb
+gem install snoo
+gem install trollop
+```
 
-Great for custom wallpapers
+### Usage
+```
+$ ./alien_wallpaper.rb -h
+Download Wallpaper from Subreddits
+           --n, -n <i>:   Number of images to download for each subreddit
+         --out, -o <s>:   Directory to save wallpaper to
+    --password, -p <s>:   Your Reddit password
+  --subreddits, -s <s>:   Comma separated subreddits to download images from
+    --username, -u <s>:   Your Reddit username
+            --help, -h:   Show this message
+```
 
-Setup
------
-
-1. Create config/reddit_account.yaml
-
-        username: $$$$$
-        password: $$$$$
-
-2. Create config/preferences.yaml
-
-        output_dir: $$$$$$
-
-    Note: output directory can be full path or path relative to where
-    alien_downloader is run.
-
-TODO
-----
-
-1. Download all images that RES can preview
-2. Allow user to specify subreddits
-3. Add info watermark to each image (e.g. user, title, date)
+## TODO
+1. Download all images that RES can preview.
