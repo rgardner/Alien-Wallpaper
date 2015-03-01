@@ -64,14 +64,18 @@ end
 def main
   opts = get_opts
 
+  threads = []
   opts[:subreddits].split(',').each do |subreddit|
-    url = "http://www.reddit.com/r/#{subreddit}.json"
-    res = Net::HTTP.get(URI(url))
-    json = JSON.parse(res)
-    json['data']['children'].each do |post|
-      download_image(post, opts[:out])
+    threads << Thread.new do
+      url = "http://www.reddit.com/r/#{subreddit}.json"
+      res = Net::HTTP.get(URI(url))
+      json = JSON.parse(res)
+      json['data']['children'].each do |post|
+        download_image(post, opts[:out])
+      end
     end
   end
+  threads.each(&:join)
 end
 
 main
