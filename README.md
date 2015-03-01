@@ -1,13 +1,13 @@
 # Alien Wallpaper
-Download images from Subreddits. Great for beautiful wallpaper. See 'usage' for
+Download images from subreddits. Great for beautiful wallpaper. See 'usage' for
 the default number of images to download, subreddits to download from, and the
 output directory.
+
 
 ## Getting Started
 ### Quick Setup
 ```
-wget https://github.com/rgardner/Alien-Image-Downloader/blob/master/alien_wallpaper.rb
-gem install snoo
+wget https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wallpaper.rb
 gem install trollop
 ```
 
@@ -23,6 +23,7 @@ Download Wallpaper from Subreddits
                           ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,winterporn,quoteporn)
             --help, -h:   Show this message
 ```
+
 
 ## TODO
 1. Download all images that RES can preview.
