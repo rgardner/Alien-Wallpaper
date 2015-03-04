@@ -51,6 +51,14 @@ def download_image(post, output_dir)
   end
 end
 
+def internet_connection?
+  begin
+    true if open("http://www.google.com/")
+  rescue
+    false
+  end
+end
+
 def get_opts
   Trollop.options do
     banner 'Download Wallpaper from Subreddits'
@@ -62,6 +70,10 @@ def get_opts
 end
 
 def main
+  unless internet_connection?
+    abort('No Internet connection available.')
+  end
+
   opts = get_opts
 
   threads = []
