@@ -24,42 +24,50 @@ EOS
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
 
+# The filename to save the post's image as.
+#   precondition: post's image is a supported filetype.
+def filename(post)
+  post['data']['id'] + post['data']['url'].match(FILE_EXTENSION_REGEX)[0]
+end
 
+# Ignore nil, self posts, and unsupported images.
 def ignore_post?(post)
   return true if post.nil?
   return true if post['data']['is_self']
-
-  unless post['data']['url'].match(FILE_EXTENSION_REGEX)
-    $stderr.puts post['data']['url']
-    return true
-  end
+  return false if post['data']['url'].match(FILE_EXTENSION_REGEX)
+  $stderr.puts post['data']['url']
+  true
 end
 
 # Download the image associated with the Reddit post.
 def download_image(post, output_dir)
-  return if ignore_post?(post)
-
   # Construct the filename and filepath
-  filename = post['data']['id'] +
-             post['data']['url'].match(FILE_EXTENSION_REGEX)[0]
-  filepath = File.join(output_dir, filename)
+  filepath = File.join(output_dir, filename(post))
   puts filepath
 
   # Need to use write-binary (wb) mode for images
-  File.open(filepath, 'wb') do |f|
-    f << open(post['data']['url']).read
+  File.open(filepath, 'wb') { |f| f << open(post['data']['url']).read }
+end
+
+# Download top 25 images for a given subreddit.
+def download_images_for_subreddit(subreddit, out_dir)
+  url = URI("http://www.reddit.com/r/#{subreddit}.json")
+  req = Net::HTTP::Get.new(url, 'User-Agent' => USER_AGENT)
+  res = Net::HTTP.start(url.host, url.port) { |http| http.request(req) }
+
+  json = JSON.parse(res.body)
+  json['data']['children'].each do |post|
+    download_image(post, out_dir) unless ignore_post?(post)
   end
 end
 
 def internet_connection?
-  begin
-    true if open("http://www.google.com/")
-  rescue
-    false
-  end
+  true if open('http://www.google.com/')
+rescue
+  false
 end
 
-def get_opts
+def options
   Trollop.options do
     banner 'Download Wallpaper from Subreddits'
     opt :n, 'Number of images to download for each subreddit', default: 25
@@ -70,21 +78,14 @@ def get_opts
 end
 
 def main
-  unless internet_connection?
-    abort('No Internet connection available.')
-  end
+  abort('No Internet connection available.') unless internet_connection?
 
-  opts = get_opts
+  opts = options
 
   threads = []
   opts[:subreddits].split(',').each do |subreddit|
     threads << Thread.new do
-      url = "http://www.reddit.com/r/#{subreddit}.json"
-      res = Net::HTTP.get(URI(url))
-      json = JSON.parse(res)
-      json['data']['children'].each do |post|
-        download_image(post, opts[:out])
-      end
+      download_images_for_subreddit(subreddit, opts[:out])
     end
   end
   threads.each(&:join)
