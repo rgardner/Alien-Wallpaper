@@ -40,6 +40,7 @@ optparse = OptionParser.new do |opts|
     options[:s] = s
   end
   opts.on('-h', '--help', 'Display this screen') do
+    puts 'Download beautiful wallpaper from subreddits'
     puts opts
     exit
   end
