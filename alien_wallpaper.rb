@@ -9,7 +9,7 @@
 require 'json'
 require 'net/http'
 require 'open-uri'
-require 'trollop'
+require 'optparse'
 
 # The default subreddits to download images from.
 DEFAULT_SUBREDDITS = <<-EOS
@@ -23,6 +23,28 @@ EOS
 
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
+
+# The command line options.
+options = { n: 25, out: Dir.pwd, subreddits: DEFAULT_SUBREDDITS.strip }
+
+optparse = OptionParser.new do |opts|
+  opts.on('-n N', Integer, 'Number of images to download for each subreddit') \
+          do |n|
+    options[:n] = n
+  end
+  opts.on('-o', '--out DIR', String, 'Directory to save wallpaper to') do |out|
+    options[:out] = out
+  end
+  opts.on('-s', '--subreddits S', String, 'Comma separated subreddits to' \
+         'download images from; the defaults are SFW') do |s|
+    options[:s] = s
+  end
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit 1
+  end
+end
+optparse.parse!
 
 # The filename to save the post's image as.
 #   precondition: post's image is a supported filetype.
@@ -46,7 +68,13 @@ def download_image(post, output_dir)
   puts filepath
 
   # Need to use write-binary (wb) mode for images
-  File.open(filepath, 'wb') { |f| f << open(post['data']['url']).read }
+  begin
+    File.open(filepath, 'wb') { |f| f << open(post['data']['url']).read }
+  rescue OpenURI::HTTPError => error
+    $stderr.puts error
+  rescue OpenSSL::SSL::SSLError => error
+    $stderr.puts error
+  end
 end
 
 # Download top 25 images for a given subreddit.
@@ -67,20 +95,8 @@ rescue
   false
 end
 
-def options
-  Trollop.options do
-    banner 'Download Wallpaper from Subreddits'
-    opt :n, 'Number of images to download for each subreddit', default: 25
-    opt :out, 'Directory to save wallpaper to', default: Dir.pwd
-    opt :subreddits, 'Comma separated subreddits to download images from; ' \
-         'the defaults are SFW', default: DEFAULT_SUBREDDITS.strip
-  end
-end
-
-def main
+def main(opts)
   abort('No Internet connection available.') unless internet_connection?
-
-  opts = options
 
   threads = []
   opts[:subreddits].split(',').each do |subreddit|
@@ -91,4 +107,4 @@ def main
   threads.each(&:join)
 end
 
-main
+main(options)
