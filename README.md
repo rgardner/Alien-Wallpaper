@@ -8,7 +8,6 @@ output directory.
 ### Quick Setup
 ```
 wget https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wallpaper.rb
-gem install trollop
 ```
 
 ### Usage
