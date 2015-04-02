@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 # Name: alien_wallpaper.rb
-# Description: Downloads top 25 images from specified subreddits.
+# Description: Downloads top images from specified subreddits.
 # Author: Bob Gardner
-# Updated: 8/23/14
+# Updated: 4/1/15
 # License: MIT
 
 require 'json'
