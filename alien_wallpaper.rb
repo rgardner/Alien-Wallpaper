@@ -78,15 +78,28 @@ def download_image(post, output_dir)
   end
 end
 
-# Download top 25 images for a given subreddit.
-def download_images_for_subreddit(subreddit, out_dir)
-  url = URI("http://www.reddit.com/r/#{subreddit}.json")
+# Return the json representation of `subreddit`
+def fetch_subreddit_data(subreddit, count = 25, after = '')
+  params = "count=#{count}&after=#{after}"
+  url = URI("http://www.reddit.com/r/#{subreddit}.json?#{params}")
   req = Net::HTTP::Get.new(url, 'User-Agent' => USER_AGENT)
   res = Net::HTTP.start(url.host, url.port) { |http| http.request(req) }
+  JSON.parse(res.body)
+end
 
-  json = JSON.parse(res.body)
-  json['data']['children'].each do |post|
-    download_image(post, out_dir) unless ignore_post?(post)
+# Download `n` images from `subreddit` to `out_dir`
+def download_images_for_subreddit(subreddit, n, out_dir)
+  json = fetch_subreddit_data(subreddit)
+  images_remaining = n
+  catch(:done) do
+    loop do
+      json['data']['children'].each do |post|
+        throw :done if images_remaining <= 0
+        download_image(post, out_dir) unless ignore_post?(post)
+        images_remaining -= 1
+      end
+      json = fetch_subreddit_data(subreddit, json['data']['after'])
+    end
   end
 end
 
@@ -102,7 +115,7 @@ def main(opts)
   threads = []
   opts[:subreddits].split(',').each do |subreddit|
     threads << Thread.new do
-      download_images_for_subreddit(subreddit, opts[:out])
+      download_images_for_subreddit(subreddit, opts[:n], opts[:out])
     end
   end
   threads.each(&:join)
