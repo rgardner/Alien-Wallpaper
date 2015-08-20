@@ -21,6 +21,16 @@ Usage: alien_wallpaper [options]
     -h, --help                       Display this screen
 ```
 
+```
+$ ./alien_multi.rb -h
+Print subreddits belonging to a user's multireddit
+Usage: alien_multi [options]
+    -u, --username USER              Reddit username
+    -p, --password PASS              Reddit password
+    -m, --multi MULTI                Multireddit name
+    -h, --help                       Display this screen
+```
+
 
 ## TODO
 1. Download all images that RES can preview.
