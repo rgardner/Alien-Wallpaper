@@ -3,15 +3,20 @@ Download images from subreddits. Great for beautiful wallpaper. See 'usage' for
 the default number of images to download, subreddits to download from, and the
 output directory.
 
+Each picture is saved to the output directory as `{reddit_id}.{filetype}`,
+e.g. `2zd9do.jpg`. You can reverse lookup any of the pictures just by going to
+`https://www.reddit.com/{reddit_id}`, which will take you to its comments page,
+e.g. `https://www.reddit.com/2zd9do`.
+
 
 ## Getting Started
 ### Quick Setup
-```
+```bash
 wget https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wallpaper.rb
 ```
 
 ### Usage
-```
+```bash
 $ ruby alien_wallpaper.rb -h
 Download beautiful wallpaper from subreddits
 Usage: alien_wallpaper [options]
@@ -21,7 +26,7 @@ Usage: alien_wallpaper [options]
     -h, --help                       Display this screen
 ```
 
-```
+```bash
 $ ./alien_multi.rb -h
 Print subreddits belonging to a user's multireddit
 Usage: alien_multi [options]
