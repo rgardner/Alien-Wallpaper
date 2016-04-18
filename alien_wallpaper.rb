@@ -3,7 +3,7 @@
 # Name: alien_wallpaper.rb
 # Description: Downloads top images from specified subreddits.
 # Author: Bob Gardner
-# Updated: 4/1/15
+# Updated: 4/18/16
 # License: MIT
 
 require 'json'
@@ -11,41 +11,16 @@ require 'net/http'
 require 'open-uri'
 require 'optparse'
 
+# Number of images to download.
+NUM_IMAGES = 10
+
 # The default subreddits to download images from.
 DEFAULT_SUBREDDITS = <<-EOS
 ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,winterporn,quoteporn
 EOS
 
-USER_AGENT = <<-EOS
-Alien Wallpaper: A beautiful desktop wallpaper downloader for Reddit by
-/u/Wolf_Blackout.
-EOS
-
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
-
-# The command line options.
-options = { n: 25, out: Dir.pwd, subreddits: DEFAULT_SUBREDDITS.strip }
-
-optparse = OptionParser.new do |opts|
-  opts.on('-n N', Integer, 'Number of images to download for each subreddit') \
-          do |n|
-    options[:n] = n
-  end
-  opts.on('-o', '--out DIR', String, 'Directory to save wallpaper to') do |out|
-    options[:out] = out
-  end
-  opts.on('-s', '--subreddits S', String, 'Comma separated subreddits to' \
-         'download images from; the defaults are SFW') do |s|
-    options[:s] = s
-  end
-  opts.on('-h', '--help', 'Display this screen') do
-    puts 'Download beautiful wallpaper from subreddits'
-    puts opts
-    exit
-  end
-end
-optparse.parse!
 
 # The filename to save the post's image as.
 #   precondition: post's image is a supported filetype.
@@ -69,27 +44,26 @@ def download_image(post, output_dir)
   puts filepath
 
   # Need to use write-binary (wb) mode for images
-  begin
-    File.open(filepath, 'wb') { |f| f << open(post['data']['url']).read }
-  rescue OpenURI::HTTPError => error
+  File.open(filepath, 'wb') { |f| f << open(post['data']['url']).read }
+rescue SocketError
+    abort('No Internet connection available')
+rescue OpenURI::HTTPError => error
     $stderr.puts error
-  rescue OpenSSL::SSL::SSLError => error
+rescue OpenSSL::SSL::SSLError => error
     $stderr.puts error
-  end
 end
 
 # Return the json representation of `subreddit`
-def fetch_subreddit_data(subreddit, count = 25, after = '')
+def fetch_subreddit_data(url, count = 25, after = '')
   params = "count=#{count}&after=#{after}"
-  url = URI("http://www.reddit.com/r/#{subreddit}.json?#{params}")
-  req = Net::HTTP::Get.new(url, 'User-Agent' => USER_AGENT)
-  res = Net::HTTP.start(url.host, url.port) { |http| http.request(req) }
-  JSON.parse(res.body)
+  JSON.parse(URI.parse("#{url}.json?#{params}").read)
+rescue SocketError
+  abort('No Internet connection available')
 end
 
-# Download `n` images from `subreddit` to `out_dir`
-def download_images_for_subreddit(subreddit, n, out_dir)
-  json = fetch_subreddit_data(subreddit)
+# Download `n` images from `url` to `out_dir`
+def download_images_for_url(url, n, out_dir)
+  json = fetch_subreddit_data(url)
   images_remaining = n
   catch(:done) do
     loop do
@@ -98,27 +72,52 @@ def download_images_for_subreddit(subreddit, n, out_dir)
         download_image(post, out_dir) unless ignore_post?(post)
         images_remaining -= 1
       end
-      json = fetch_subreddit_data(subreddit, json['data']['after'])
+      json = fetch_subreddit_data(url, json['data']['after'])
     end
   end
 end
 
-def internet_connection?
-  true if open('http://www.google.com/')
-rescue
-  false
+def multi_to_url(multi)
+  user, multi = multi.split('/')
+  "https://www.reddit.com/user/#{user}/m/#{multi}"
+end
+
+def subreddit_to_url(subreddit)
+  "https://www.reddit.com/r/#{subreddit}"
+end
+
+# The command line options.
+def cli_options
+  options = { out: Dir.pwd, s: DEFAULT_SUBREDDITS.strip }
+  OptionParser.new do |opts|
+    opts.on('-s', '--subreddit S', String, 'Comma separated subreddits') do |s|
+      options[:s] = s
+    end
+    opts.on('-m', '--multi M', String, 'user/multireddit') do |m|
+      options[:m] = m
+    end
+    opts.on('-o', '--out DIR', String, 'Directory to save wallpaper to') do |out|
+      options[:out] = out
+    end
+    opts.on_tail('-h', '--help', 'Show this message') do
+      puts 'Download beautiful wallpaper from subreddits'
+      puts opts
+      exit
+    end
+  end.parse!
+  options
 end
 
 def main(opts)
-  abort('No Internet connection available.') unless internet_connection?
-
   threads = []
-  opts[:subreddits].split(',').each do |subreddit|
+  urls = opts[:s].split(',').map { |s| subreddit_to_url(s) }
+  urls << multi_to_url(opts[:m]) unless opts[:m].nil?
+  urls.each do |url|
     threads << Thread.new do
-      download_images_for_subreddit(subreddit, opts[:n], opts[:out])
+      download_images_for_url(url, NUM_IMAGES, opts[:out])
     end
   end
   threads.each(&:join)
 end
 
-main(options)
+main(cli_options)
