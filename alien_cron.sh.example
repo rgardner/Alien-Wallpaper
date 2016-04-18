@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# wallpaper: cron script for downloading images from Reddit.
+
+# Change these.
+SUBREDDITS='aww,pics'
+#MULTI="USER/MULTI_NAME"
+#OUT="/Users/example/Pictures/wallpaper"
+OUT=""
+
+SRC=$(pwd)
+
+ruby "$SRC"/alien_wallpaper.rb \
+  --subreddits="$SUBREDDITS"   \
+  #--multi "$MULTI"             \
+  --out "$OUT"

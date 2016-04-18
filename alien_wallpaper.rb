@@ -11,13 +11,17 @@ require 'net/http'
 require 'open-uri'
 require 'optparse'
 
-# Number of images to download.
-NUM_IMAGES = 10
+# Number of images to download per subreddit/multireddit.
+NUM_IMAGES = 25
 
 # The default subreddits to download images from.
-DEFAULT_SUBREDDITS = <<-EOS
-ArchitecturePorn,CityPorn,EarthPorn,SkyPorn,spaceporn,winterporn,quoteporn
-EOS
+DEFAULT_SUBREDDITS = ['ArchitecturePorn',
+                      'CityPorn',
+                      'EarthPorn',
+                      'SkyPorn',
+                      'spaceporn',
+                      'winterporn',
+                      'quoteporn']
 
 # Supported file types.
 FILE_EXTENSION_REGEX = /\.(jpg|jpeg|gif|png)$/i
@@ -88,15 +92,15 @@ end
 
 # The command line options.
 def cli_options
-  options = { out: Dir.pwd, s: DEFAULT_SUBREDDITS.strip }
+  options = { out: Dir.pwd, s: DEFAULT_SUBREDDITS }
   OptionParser.new do |opts|
-    opts.on('-s', '--subreddit S', String, 'Comma separated subreddits') do |s|
+    opts.on('--subreddits=x,y,z', Array, 'List of subreddits') do |s|
       options[:s] = s
     end
-    opts.on('-m', '--multi M', String, 'user/multireddit') do |m|
+    opts.on('--multi M', String, 'user/multireddit') do |m|
       options[:m] = m
     end
-    opts.on('-o', '--out DIR', String, 'Directory to save wallpaper to') do |out|
+    opts.on('--out DIR', String, 'Directory to save wallpaper to') do |out|
       options[:out] = out
     end
     opts.on_tail('-h', '--help', 'Show this message') do
@@ -110,7 +114,7 @@ end
 
 def main(opts)
   threads = []
-  urls = opts[:s].split(',').map { |s| subreddit_to_url(s) }
+  urls = opts[:s].map { |s| subreddit_to_url(s) }
   urls << multi_to_url(opts[:m]) unless opts[:m].nil?
   urls.each do |url|
     threads << Thread.new do
