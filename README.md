@@ -12,7 +12,7 @@ e.g. `https://www.reddit.com/2zd9do`.
 ## Getting Started
 ### Quick Setup
 ```bash
-wget https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wallpaper.rb
+curl https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wallpaper.rb >alien_wallpaper.rb
 ```
 
 ### Usage
@@ -20,22 +20,11 @@ wget https://raw.githubusercontent.com/rgardner/Alien-Wallpaper/master/alien_wal
 $ ruby alien_wallpaper.rb -h
 Download beautiful wallpaper from subreddits
 Usage: alien_wallpaper [options]
-    -n N                             Number of images to download for each subreddit
-    -o, --out DIR                    Directory to save wallpaper to
-    -s, --subreddits S               Comma separated subreddits todownload images from; the defaults are SFW
-    -h, --help                       Display this screen
+        --subreddits=x,y,z           List of subreddits
+        --multi M                    user/multireddit
+        --out DIR                    Directory to save wallpaper to
+    -h, --help                       Show this message
 ```
-
-```bash
-$ ./alien_multi.rb -h
-Print subreddits belonging to a user's multireddit
-Usage: alien_multi [options]
-    -u, --username USER              Reddit username
-    -p, --password PASS              Reddit password
-    -m, --multi MULTI                Multireddit name
-    -h, --help                       Display this screen
-```
-
 
 ## TODO
 1. Download all images that RES can preview.
