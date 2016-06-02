@@ -42,7 +42,7 @@ def download_image(post, out_dir):
     if not out_dir.is_absolute():
         out_dir = pathlib.Path(pathlib.Path.cwd(), out_dir)
     path = out_dir / filename(post)
-    print(path)
+    logging.info(path)
 
     url = post['data']['url']
     try:
@@ -78,6 +78,12 @@ def subreddit_to_url(subreddit):
 
 
 def download_all_images(subreddits, n, out_dir, par=True):
+    """
+    Download n images for each subreddit to out_dir.
+
+    :param par: use multiprocessing.Pool to download images in parallel
+
+    """
     if par:
         pool = multiprocessing.Pool()
         download_images_to_dir = partial(download_images, n=n, out_dir=out_dir)
