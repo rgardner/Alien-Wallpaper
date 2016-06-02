@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>wallpaper.job</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/bin/alien_wallpaper</string>
+		<string>--multireddit</string>
+		<string>REDDIT_USERNAME/MULTINAME</string>
+		<string>--out</string>
+		<string>/Users/username/Pictures/wallpaper</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/tmp/wallpaper.job.err</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/wallpaper.job.out</string>
+</dict>
+</plist>

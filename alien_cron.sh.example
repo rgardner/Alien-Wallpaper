@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# wallpaper: cron script for downloading images from Reddit.
-
-# Change these settings:
-SUBREDDITS='aww,pics'
-MULTI=''  # or 'REDDIT_USERNAME/MULTINAME'
-#OUT="/Users/example/Pictures/wallpaper"
-
-alien_wallpaper --subreddits "$SUBREDDITS" --multireddit "$MULTI" --out "$OUT"
