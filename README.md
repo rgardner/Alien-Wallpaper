@@ -28,12 +28,8 @@ optional arguments:
 $ # download project
 $ curl -LOk https://github.com/rgardner/Alien-Wallpaper/archive/master.zip
 $ unzip master.zip && cd Alien-Wallpaper-master
-$ # install script
-$ cp alien_wallpaper /usr/local/bin
-$ # install launchd plist
-$ # edit wallpaper.job.plist
-$ cp wallpaper.job.plist ~/Library/LaunchAgents
-$ launchctl load -w ~/Library/LaunchAgents/wallpaper.job.plist
+$ # run installation helper script
+$ ./install_helper.py
 ```
 
 

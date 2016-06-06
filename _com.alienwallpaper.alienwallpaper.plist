@@ -3,20 +3,22 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>wallpaper.job</string>
+	<string>com.alienwallpaper.alienwallpaper</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/local/bin/alien_wallpaper</string>
+		<string>--subreddits</string>
+		<string>$subreddits</string>
 		<string>--multireddit</string>
-		<string>REDDIT_USERNAME/MULTINAME</string>
+		<string>$multireddit</string>
 		<string>--out</string>
-		<string>/Users/username/Pictures/wallpaper</string>
+		<string>$out</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>StandardErrorPath</key>
-	<string>/tmp/wallpaper.job.err</string>
+	<string>/tmp/com.alienwallpaper.alienwallpaper.err</string>
 	<key>StandardOutPath</key>
-	<string>/tmp/wallpaper.job.out</string>
+	<string>/tmp/com.alienwallpaper.alienwallpaper.out</string>
 </dict>
 </plist>
