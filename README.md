@@ -1,6 +1,7 @@
 # Alien Wallpaper
 
-Download images from subreddits. Great for beautiful wallpaper.
+Download images from subreddits. Great for beautiful wallpaper. Requires Python
+3.3+.
 
 Each picture is saved to the output directory as `{reddit_id}.{filetype}`,
 e.g. `2zd9do.jpg`. You can reverse lookup any of the pictures just by going to

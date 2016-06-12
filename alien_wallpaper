@@ -3,8 +3,9 @@
 Download images from Reddit.
 
 ```bash
-$ python3 alien_wallpaper.py --help
+$ alien_wallpaper --help
 ```
+
 """
 
 import argparse
@@ -34,7 +35,7 @@ def valid_post(post):
     try:
         return not data['is_self'] and bool(FILE_EXTENSION_PROG.match(data['url']))
     except KeyError:
-        logger.exception('valid_post')
+        logger.exception('valid_post: {}'.format(data))
         return False
 
 

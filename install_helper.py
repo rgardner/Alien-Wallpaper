@@ -4,6 +4,7 @@ import os
 import os.path
 import shutil
 import string
+import sys
 
 BIN = 'alien_wallpaper'
 LAUNCHD_PLIST_TEMPL = '_com.alienwallpaper.alienwallpaper.plist'
@@ -11,6 +12,13 @@ LAUNCHD_PLIST_FINAL = 'com.alienwallpaper.alienwallpaper.plist'
 
 
 def main():
+    if len(sys.argv) > 1 and 'uninstall' in sys.argv[1]:
+        uninstall()
+    else:
+        install()
+
+
+def install():
     # prompt user for subreddits, multireddit, and output directory
     subreddits = input('subreddits (comma-separated): ')
     multireddit = input('multireddit (USER/MULTI): ')
