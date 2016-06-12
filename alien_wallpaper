@@ -13,7 +13,7 @@ from functools import partial
 import json
 import logging
 import multiprocessing
-import pathlib
+import os.path
 import re
 import shutil
 import urllib.parse
@@ -45,15 +45,12 @@ def filename(post):
 
 
 def download_image(post, out_dir):
-    out_dir = pathlib.Path(out_dir)
-    if not out_dir.is_absolute():
-        out_dir = pathlib.Path(pathlib.Path.cwd(), out_dir)
-    path = out_dir / filename(post)
+    path = os.path.join(out_dir, filename(post))
     logger.info(path)
 
     url = post['data']['url']
     try:
-        with urllib.request.urlopen(url) as response, path.open('wb+') as out_file:
+        with urllib.request.urlopen(url) as response, open(path, 'wb+') as out_file:
             shutil.copyfileobj(response, out_file)
     except urllib.error.HTTPError:
         logger.exception('download_image')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from pathlib import Path
+import os.path
 import shutil
 import string
 
@@ -26,9 +26,19 @@ def main():
 
     # install wallpaper script and initialize launchd job
     shutil.copy2(BIN, '/usr/local/bin')
-    dst = Path.home().joinpath('Library/LaunchAgents')
-    shutil.copy2(LAUNCHD_PLIST_FINAL, str(dst))
-    os.system('launchctl load -w ' + str(dst.joinpath(LAUNCHD_PLIST_FINAL)))
+    la_dir = os.path.join(os.path.expanduser('~'), 'Library/LaunchAgents')
+    shutil.copy2(LAUNCHD_PLIST_FINAL, la_dir)
+    os.system('launchctl load -w ' + os.path.join(la_dir, LAUNCHD_PLIST_FINAL))
+
+
+def uninstall():
+    os.remove(os.path.join('/usr/local/bin', BIN))
+    la_dir = os.path.join(os.path.expanduser('~'), 'Library/LaunchAgents')
+    plist = os.path.join(la_dir, LAUNCHD_PLIST_FINAL)
+    os.system('launchctl unload -w ' + plist)
+    os.remove(plist)
+    os.remove('/tmp/com.alienwallpaper.alienwallpaper.out')
+    os.remove('/tmp/com.alienwallpaper.alienwallpaper.err')
 
 
 if __name__ == '__main__':
