@@ -17,6 +17,7 @@ import multiprocessing
 import os.path
 import re
 import shutil
+import sys
 import urllib.parse
 import urllib.request
 
@@ -53,8 +54,8 @@ def download_image(post, out_dir):
     try:
         with urllib.request.urlopen(url) as response, open(path, 'wb+') as out_file:
             shutil.copyfileobj(response, out_file)
-    except urllib.error.HTTPError:
-        logger.exception('download_image')
+    except urllib.error.HTTPError as e:
+        logger.exception('download_image: {}'.format(e))
 
 
 def fetch_metadata(url, count=25, after=''):
@@ -110,7 +111,7 @@ def parse_cli():
 
 def main():
     # initialize logger
-    logger.setLevel(logging.INFO)
+    logger.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     # Parse CLI arguments to get subreddits and output directory
     args = parse_cli()
