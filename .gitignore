@@ -1,3 +1,4 @@
 .env
 .venv
 com.alienwallpaper.alienwallpaper.plist
+__pycache__
