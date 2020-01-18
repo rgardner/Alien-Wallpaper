@@ -1,30 +1,37 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import os.path
 import shutil
 import string
-import sys
 
-BIN = 'alien_wallpaper'
+BIN = 'alien_wallpaper.py'
 LAUNCHD_PLIST_TEMPL = '_com.alienwallpaper.alienwallpaper.plist'
 LAUNCHD_PLIST_FINAL = 'com.alienwallpaper.alienwallpaper.plist'
 
 
 def main():
-    if len(sys.argv) > 1 and 'uninstall' in sys.argv[1]:
+    args = parse_cli_args()
+    if args.uninstall:
         uninstall()
     else:
         install()
 
+def parse_cli_args():
+    parser = argparse.ArgumentParser(description='Install helper')
+    parser.add_argument('--uninstall', action='store_true')
+    return parser.parse_args()
+
 
 def install():
-    # prompt user for subreddits, multireddit, and output directory
+    # first uninstall to unload launch agent
+    uninstall()
+
     subreddits = input('subreddits (comma-separated): ')
-    multireddit = input('multireddit (USER/MULTI): ')
+    multireddit = input('multireddit (USERNAME/MULTINAME): ')
     out = input('out (e.g. /Users/user/Pictures): ')
 
-    # read plist template and write config variables
     with open(LAUNCHD_PLIST_TEMPL) as f:
         templ = string.Template(f.read())
     final = templ.substitute(subreddits=subreddits, multireddit=multireddit,
@@ -32,7 +39,6 @@ def install():
     with open(LAUNCHD_PLIST_FINAL, 'w+') as f:
         f.write(str(final))
 
-    # install wallpaper script and initialize launchd job
     shutil.copy2(BIN, '/usr/local/bin')
     la_dir = os.path.join(os.path.expanduser('~'), 'Library/LaunchAgents')
     shutil.copy2(LAUNCHD_PLIST_FINAL, la_dir)

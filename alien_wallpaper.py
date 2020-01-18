@@ -99,17 +99,17 @@ def download_all_images(subreddits: typing.Sequence[Url], n, out_dir):
             pool.apply(download_images, args=(subreddit, n, out_dir))
 
 
-def parse_cli():
+def parse_cli_args():
     parser = argparse.ArgumentParser(description='Download images from Reddit.')
     parser.add_argument('--subreddits', nargs='*')
     parser.add_argument('--multireddit', nargs='?', help='USER/multi_name')
     parser.add_argument('--out', required=True)
-    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     return parser.parse_args()
 
 
 def main():
-    args = parse_cli()
+    args = parse_cli_args()
     logging_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=logging_level)
 

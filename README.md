@@ -9,17 +9,19 @@ e.g. `2zd9do.jpg`. You can reverse lookup any of the pictures just by going to
 e.g. `https://www.reddit.com/2zd9do`.
 
 ```bash
-$ alien_wallpaper --help
-usage: alien_wallpaper [-h] [--subreddits [SUBREDDITS [SUBREDDITS ...]]]
-                       [--multireddit [MULTIREDDIT]] --out OUT
+$ python3 alien_wallpaper.py --help
+usage: alien_wallpaper.py [-h] [--subreddits [SUBREDDITS [SUBREDDITS ...]]]
+                          [--multireddit [MULTIREDDIT]] --out OUT [-v]
 
-Download Reddit images.
+Download images from Reddit.
 
 optional arguments:
   -h, --help            show this help message and exit
   --subreddits [SUBREDDITS [SUBREDDITS ...]]
   --multireddit [MULTIREDDIT]
+                        USER/multi_name
   --out OUT
+  -v, --verbose
 ```
 
 

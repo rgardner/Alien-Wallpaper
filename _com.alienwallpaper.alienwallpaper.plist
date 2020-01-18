@@ -6,7 +6,7 @@
 	<string>com.alienwallpaper.alienwallpaper</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/bin/alien_wallpaper</string>
+    <string>/usr/local/bin/python3 /usr/local/bin/alien_wallpaper.py</string>
 		<string>--subreddits</string>
 		<string>$subreddits</string>
 		<string>--multireddit</string>
