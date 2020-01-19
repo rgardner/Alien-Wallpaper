@@ -9,7 +9,7 @@ e.g. `2zd9do.jpg`. You can reverse lookup any of the pictures just by going to
 e.g. `https://www.reddit.com/2zd9do`.
 
 ```bash
-$ python3 alien_wallpaper.py --help
+$ alien_wallpaper --help
 usage: alien_wallpaper.py [-h] [--subreddits [SUBREDDITS [SUBREDDITS ...]]]
                           [--multireddit [MULTIREDDIT]] --out OUT [-v]
 
@@ -24,14 +24,32 @@ optional arguments:
   -v, --verbose
 ```
 
+## Features
+
+- Can be easily set up to run on a schedule on macOS using `launchctl`
+- Supports downloading images from one or more subreddits, or a multireddit
+
 ## Installation
 
+This project requires Python 3.8\* and [Poetry](https://python-poetry.org/).
+
 ```bash
-# run installation helper script
-./install_helper.py
+# Install dependencies
+poetry install
+
+# Using the interactive installer, set up the program to run via launchctl
+tools/scripts/setup_launchctl.py
 ```
 
-## TODO
+## Contributing
+
+Run the test suite.
+
+```sh
+invoke test
+```
+
+## Future Improvements
 
 1. Download all images that RES can preview.
    - Flickr lightbox.

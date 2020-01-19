@@ -1,22 +1,25 @@
 import json
-import unittest
-import typing
+from typing import Any, Optional
 
 import alien_wallpaper
-from alien_wallpaper import Post, Url
+from alien_wallpaper import Post, Url, __version__
 
 
-class TestPost:
-    def __init__(self, post: Post, filename: typing.Optional[str], json_data):
+def test_version():
+    assert __version__ == "0.1.0"
+
+
+class MockPost:
+    def __init__(self, post: Post, filename: Optional[str], json_data):
         self.post = post
         self.filename = filename
-        self.extension = filename.split('.')[1] if filename is not None else None
+        self.extension = filename.split(".")[1] if filename is not None else None
         self.json = json.loads(json_data)
 
 
-test_post = TestPost(
-    Post('5gfjre', False, Url('http://i.imgur.com/XQgSj3o.jpg')),
-    '5gfjre.jpg',
+test_post = MockPost(
+    Post("5gfjre", False, Url("http://i.imgur.com/XQgSj3o.jpg")),
+    "5gfjre.jpg",
     """
 {
     "contest_mode": false,
@@ -127,11 +130,17 @@ test_post = TestPost(
     "num_reports": null,
     "ups": 3959
 }
-""")
+""",
+)
 
-test_self_post = TestPost(
-    Post('5f9zc4', True, Url(
-        'https://www.reddit.com/r/rust/comments/5f9zc4/whats_everyone_working_on_this_week_422016/')),
+test_self_post = MockPost(
+    Post(
+        "5f9zc4",
+        True,
+        Url(
+            "https://www.reddit.com/r/rust/comments/5f9zc4/whats_everyone_working_on_this_week_422016/"
+        ),
+    ),
     None,
     """
 {
@@ -195,28 +204,25 @@ test_self_post = TestPost(
     "num_reports": null,
     "ups": 20
 }
-""")
+""",
+)
 
 
-class TestAlienWallpaper(unittest.TestCase):
-    def test_post_from_json(self):
-        post = alien_wallpaper.Post.from_json(test_post.json)
-        self.assertEqual(post.id, test_post.post.id)
-        self.assertEqual(post.is_self, test_post.post.is_self)
-        self.assertEqual(post.url, test_post.post.url)
-        self.assertTrue(post.is_valid)
-        self.assertEqual(post.extension, test_post.extension)
-        self.assertEqual(post.filename, test_post.filename)
-
-    def test_self_post_from_json(self):
-        post = alien_wallpaper.Post.from_json(test_self_post.json)
-        self.assertEqual(post.id, test_self_post.post.id)
-        self.assertEqual(post.is_self, test_self_post.post.is_self)
-        self.assertEqual(post.url, test_self_post.post.url)
-        self.assertFalse(post.is_valid)
-        self.assertIsNone(post.extension)
-        self.assertIsNone(post.filename)
+def test_post_from_json():
+    post = alien_wallpaper.Post.from_json(test_post.json)
+    assert post.id == test_post.post.id
+    assert post.is_self == test_post.post.is_self
+    assert post.url == test_post.post.url
+    assert post.is_valid
+    assert post.extension == test_post.extension
+    assert post.filename == test_post.filename
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_self_post_from_json():
+    post = alien_wallpaper.Post.from_json(test_self_post.json)
+    assert post.id == test_self_post.post.id
+    assert post.is_self == test_self_post.post.is_self
+    assert post.url == test_self_post.post.url
+    assert not post.is_valid
+    assert post.extension is None
+    assert post.filename is None

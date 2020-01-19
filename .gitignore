@@ -1,4 +1,6 @@
-.env
-.venv
-com.alienwallpaper.alienwallpaper.plist
+# Python
 __pycache__
+*.egg*
+
+# App
+com.alienwallpaper.alienwallpaper.plist

@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-"""
-Download images from Reddit.
-
-```bash
-$ alien_wallpaper --help
-```
-
-"""
+"""Alien Wallpaper main entrypoint."""
 
 import argparse
 import json
@@ -21,12 +13,19 @@ import urllib.parse
 import urllib.request
 
 IMAGES_PER_SUBREDDIT = 25
-DEFAULT_SUBREDDITS = ['ArchitecturePorn', 'CityPorn', 'EarthPorn', 'SkyPorn',
-                      'spaceporn', 'winterporn', 'quoteporn']
-USER_AGENT = 'AlienWallpaper by /u/WolfBlackout'
+DEFAULT_SUBREDDITS = [
+    "ArchitecturePorn",
+    "CityPorn",
+    "EarthPorn",
+    "SkyPorn",
+    "spaceporn",
+    "winterporn",
+    "quoteporn",
+]
+USER_AGENT = "AlienWallpaper by /u/WolfBlackout"
 
-FILE_EXTENSION_PROG = re.compile('.*.(jpg|jpeg|gif|png)$', re.IGNORECASE)
-Url = typing.NewType('Url', str)
+FILE_EXTENSION_PROG = re.compile(".*.(jpg|jpeg|gif|png)$", re.IGNORECASE)
+Url = typing.NewType("Url", str)
 
 
 class Post:
@@ -42,40 +41,44 @@ class Post:
     @property
     def filename(self) -> typing.Optional[str]:
         if self.extension is not None:
-            return self.id + '.' + self.extension
+            return self.id + "." + self.extension
+        return None
 
     @property
     def extension(self) -> typing.Optional[str]:
         match = FILE_EXTENSION_PROG.match(self.url)
         if match is not None:
             return match.group(1)
+        return None
 
     def download(self, out_dir):
         path = os.path.join(out_dir, self.filename)
         logging.debug(path)
 
         try:
-            with urllib.request.urlopen(self.url) as response, open(path, 'wb+') as out_file:
+            with urllib.request.urlopen(self.url) as response, open(
+                path, "wb+"
+            ) as out_file:
                 shutil.copyfileobj(response, out_file)
         except urllib.error.HTTPError as e:
             logging.exception(e)
 
     @staticmethod
-    def from_json(data) -> 'Post':
-        return Post(data['id'], bool(data['is_self']), Url(data['url']))
+    def from_json(data) -> "Post":
+        return Post(data["id"], bool(data["is_self"]), Url(data["url"]))
 
 
 def subreddit_to_url(subreddit: str) -> Url:
-    return Url('https://www.reddit.com/r/{}'.format(subreddit))
+    return Url("https://www.reddit.com/r/{}".format(subreddit))
 
 
-def fetch_posts(subreddit: Url, limit=25, after=''):
-    params = urllib.parse.urlencode({'limit': limit, 'after': after})
-    url = '{}.json?{}'.format(subreddit, params)
-    req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+def fetch_posts(subreddit: Url, limit=25, after=""):
+    params = urllib.parse.urlencode({"limit": limit, "after": after})
+    url = "{}.json?{}".format(subreddit, params)
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     resp = urllib.request.urlopen(req)
-    result = json.loads(resp.read().decode('utf-8'))
-    return [Post.from_json(p['data']) for p in result['data']['children']]
+    result = json.loads(resp.read().decode("utf-8"))
+    return [Post.from_json(p["data"]) for p in result["data"]["children"]]
 
 
 def download_images(subreddit_name, n, out_dir) -> None:
@@ -100,11 +103,11 @@ def download_all_images(subreddits: typing.Sequence[Url], n, out_dir):
 
 
 def parse_cli_args():
-    parser = argparse.ArgumentParser(description='Download images from Reddit.')
-    parser.add_argument('--subreddits', nargs='*')
-    parser.add_argument('--multireddit', nargs='?', help='USER/multi_name')
-    parser.add_argument('--out', required=True)
-    parser.add_argument('--verbose', action='store_true')
+    parser = argparse.ArgumentParser(description="Download images from Reddit.")
+    parser.add_argument("--subreddits", nargs="*")
+    parser.add_argument("--multireddit", nargs="?", help="USER/multi_name")
+    parser.add_argument("--out", required=True)
+    parser.add_argument("--verbose", action="store_true")
     return parser.parse_args()
 
 
@@ -121,11 +124,8 @@ def main():
             subreddits.extend([subreddit_to_url(s) for s in args.subreddits])
 
         if args.multireddit:
-            user, multi = args.multireddit.split('/')
-            multi_url = 'https://www.reddit.com/user/{}/m/{}'.format(user, multi)
+            user, multi = args.multireddit.split("/")
+            multi_url = "https://www.reddit.com/user/{}/m/{}".format(user, multi)
             subreddits.append(multi_url)
 
     download_all_images(subreddits, IMAGES_PER_SUBREDDIT, args.out)
-
-if __name__ == '__main__':
-    main()
