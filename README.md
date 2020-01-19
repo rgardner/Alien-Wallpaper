@@ -24,20 +24,15 @@ optional arguments:
   -v, --verbose
 ```
 
-
 ## Installation
 
 ```bash
-$ # download project
-$ curl -LOk https://github.com/rgardner/Alien-Wallpaper/archive/master.zip
-$ unzip master.zip && cd Alien-Wallpaper-master
-$ # run installation helper script
-$ ./install_helper.py
+# run installation helper script
+./install_helper.py
 ```
-
 
 ## TODO
 
 1. Download all images that RES can preview.
-  - Flickr lightbox.
-  - urls without a file extension.
+   - Flickr lightbox.
+   - urls without a file extension.
