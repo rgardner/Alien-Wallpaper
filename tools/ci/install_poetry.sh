@@ -3,5 +3,5 @@
 
 set -euo pipefail
 
-python get-poetry.py --preview -y
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
 source "${HOME}/.poetry/env"
