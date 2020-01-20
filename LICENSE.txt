@@ -1,4 +1,4 @@
-Copyright (c) 2016 Robert Gardner
+Copyright (c) 2020 Bob Gardner
 
 MIT License
 
