@@ -1,4 +1,5 @@
 import json
+import pytest
 from typing import Any, Optional
 
 import alien_wallpaper
@@ -17,7 +18,7 @@ class MockPost:
         self.json = json.loads(json_data)
 
 
-test_post = MockPost(
+TEST_POST = MockPost(
     Post("5gfjre", False, Url("http://i.imgur.com/XQgSj3o.jpg")),
     "5gfjre.jpg",
     """
@@ -133,7 +134,7 @@ test_post = MockPost(
 """,
 )
 
-test_self_post = MockPost(
+TEST_SELF_POST = MockPost(
     Post(
         "5f9zc4",
         True,
@@ -209,20 +210,21 @@ test_self_post = MockPost(
 
 
 def test_post_from_json():
-    post = alien_wallpaper.Post.from_json(test_post.json)
-    assert post.id == test_post.post.id
-    assert post.is_self == test_post.post.is_self
-    assert post.url == test_post.post.url
-    assert post.is_valid
-    assert post.extension == test_post.extension
-    assert post.filename == test_post.filename
+    post = alien_wallpaper.Post.from_json(TEST_POST.json)
+    assert post == TEST_POST.post
 
 
 def test_self_post_from_json():
-    post = alien_wallpaper.Post.from_json(test_self_post.json)
-    assert post.id == test_self_post.post.id
-    assert post.is_self == test_self_post.post.is_self
-    assert post.url == test_self_post.post.url
-    assert not post.is_valid
-    assert post.extension is None
-    assert post.filename is None
+    post = alien_wallpaper.Post.from_json(TEST_SELF_POST.json)
+    assert post == TEST_SELF_POST.post
+
+
+@pytest.mark.large
+def test_download_all_images(tmp_path):
+    subreddits = [alien_wallpaper.custom_feed_to_url("wolf_blackout", "wallpaper")]
+    n = 1
+    out_dir = tmp_path / "output"
+    out_dir.mkdir()
+
+    alien_wallpaper.download_all_images(subreddits, n, out_dir)
+    assert len(list(out_dir.iterdir())) == 1
