@@ -12,7 +12,23 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Linting
+      - name: Install poetry
         run: |
-          pip3 install pre-commit
-          pre-commit run --origin HEAD --source origin/HEAD
+          python get-poetry.py --preview -y
+          source "${HOME}/.poetry/env"
+      - name: Linting
+        run: invoke lint-ci
+
+  Testing:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install poetry
+        run: tools/ci/install_poetry.sh
+      - name: Run Tests
+        run: invoke test

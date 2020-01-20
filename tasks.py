@@ -19,3 +19,9 @@ def test(ctx):
 def lint(ctx):
     """Runs linters."""
     ctx.run("pre-commit run")
+
+
+@task
+def lint_ci(ctx):
+    """Runs linters in CI configuration."""
+    ctx.run("poetry run pre-commit run --all-files")
