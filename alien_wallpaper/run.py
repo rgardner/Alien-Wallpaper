@@ -10,11 +10,13 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, NewType, Optional, Sequence
+from urllib.error import HTTPError
 
-IMAGES_PER_SUBREDDIT = 25
+IMAGES_PER_SUBREDDIT = 5
 DEFAULT_SUBREDDITS = [
     "ArchitecturePorn",
     "CityPorn",
@@ -119,7 +121,9 @@ def download_images(subreddit_name: Url, num_images: int, out_dir: Path) -> None
     curr_images = 0
     while True:
         for post in posts:
-            post.download(out_dir)
+            with suppress(HTTPError):
+                post.download(out_dir)
+
             curr_images += 1
             if curr_images >= num_images:
                 return
@@ -152,15 +156,15 @@ def parse_cli_args():
     parser = argparse.ArgumentParser(
         prog="alien_wallpaper", description="Download images from Reddit."
     )
-    parser.add_argument("-s", "--subreddits", nargs="*", help="One or more subreddits.")
+    parser.add_argument("-s", "--subreddits", nargs="*", help="one or more subreddits.")
     parser.add_argument(
         "-c",
         "--custom-feeds",
         nargs="*",
-        help="One or more custom feeds in the format USER/CUSTOM_FEED_NAME",
+        help="one or more custom feeds in the format USER/CUSTOM_FEED_NAME",
     )
     parser.add_argument(
-        "-o", "--out", required=True, type=Path, help="Output directory"
+        "-o", "--out", required=True, type=Path, help="output directory"
     )
     parser.add_argument("--verbose", action="store_true")
     return parser.parse_args()

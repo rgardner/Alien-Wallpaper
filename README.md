@@ -3,7 +3,7 @@
 ![Tests Status](https://github.com/rgardner/Alien-Wallpaper/workflows/CI/badge.svg)
 
 Download images from subreddits. Great for beautiful wallpaper. Requires Python
-3.3+.
+3.8+.
 
 Each picture is saved to the output directory as `{reddit_id}.{filetype}`,
 e.g. `2zd9do.jpg`. You can reverse lookup any of the pictures just by going to
@@ -35,15 +35,45 @@ optional arguments:
 
 This project requires Python 3.8\* and [Poetry](https://python-poetry.org/).
 
-```bash
-# Install dependencies
-poetry install
+Install dependencies:
 
-# Using the interactive installer, set up the program to run via launchctl
-tools/scripts/setup_launchctl.py
+```bash
+# Use `--extras launchd` to facilitate launchd support on macOS
+poetry install --extras launchd
+```
+
+### Set up launchd agent
+
+```bash
+cd tools/launchd
+
+# Edit launchd_config.toml
+cp launchd_config.example.toml launchd_config.toml
+vim launchd_config.toml
+
+# Run installer
+./setup_launchd_agent.py
+```
+
+Logs are available here:
+
+```bash
+$ tools/launchd/setup_launchd_agent.py status
+Launchd Agent: Installed
+Debug logs: /Users/user/Logs/com.alienwallpaper.alienwallpaper/com.alienwallpaper.alienwallpaper.out.log
+Error logs: /Users/user/Logs/com.alienwallpaper.alienwallpaper/com.alienwallpaper.alienwallpaper.err.log
+```
+
+To uninstall the agent and remove the log files:
+
+```bash
+tools/launchd/setup_launchd_agent.py uninstall
 ```
 
 ## Contributing
+
+This project uses [pre-commit](https://pre-commit.com/) for git pre-commit
+hook management. Run `invoke setup` to configure them.
 
 Run the test suite.
 
