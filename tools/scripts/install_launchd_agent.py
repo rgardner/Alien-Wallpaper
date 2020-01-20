@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Helper tool to install Alien Wallpaper as a launchd agent."""
+
 import argparse
 import plistlib
 import subprocess
@@ -10,6 +12,7 @@ LAUNCHD_PLIST_NAME = "com.alienwallpaper.alienwallpaper.plist"
 
 
 def generate_launchd_config(program_argv: List[str]) -> Dict[Any, Any]:
+    """Generates launchd config that runs the program on a schedule."""
     return {
         "Label": "com.alienwallpaper.alienwallpaper",
         "ProgramArguments": program_argv,
@@ -20,6 +23,7 @@ def generate_launchd_config(program_argv: List[str]) -> Dict[Any, Any]:
 
 
 def install():
+    """Installs Alien Wallpaper launchd agent."""
     # first uninstall to unload launch agent
     uninstall()
 
@@ -46,6 +50,7 @@ def install():
 
 
 def uninstall():
+    """Uninstalls Alien Wallpaper launchd agent."""
     plist = get_launch_agents_dir() / LAUNCHD_PLIST_NAME
     subprocess.run(
         ["launchctl", "unload", "-w", plist],
@@ -61,26 +66,31 @@ def uninstall():
 
 
 def get_launch_agents_dir() -> Path:
+    """Returns user LaunchAgents directory."""
     launch_agents_dir = Path.home() / "Library" / "LaunchAgents"
     assert launch_agents_dir.is_dir()
     return launch_agents_dir
 
 
 def get_agent_log_dir() -> Path:
+    """Returns user log directory."""
     log_root_dir = Path.home() / "Library" / "Logs"
     assert log_root_dir.is_dir()
     return log_root_dir
 
 
 def get_agent_stdout_log() -> Path:
+    """Returns path to stdout log file."""
     return get_agent_log_dir() / "com.alienwallpaper.alienwallpaper.out"
 
 
 def get_agent_stderr_log() -> Path:
+    """Returns path to stderr log file."""
     return get_agent_log_dir() / "com.alienwallpaper.alienwallpaper.err"
 
 
 def parse_cli_args() -> argparse.Namespace:
+    """Parses command line arguments."""
     parser = argparse.ArgumentParser(
         description="Install Alien Wallpaper launchd agent"
     )
@@ -93,6 +103,7 @@ def parse_cli_args() -> argparse.Namespace:
 
 
 def main():
+    """Main entrypoint."""
     args = parse_cli_args()
     if args.uninstall:
         uninstall()

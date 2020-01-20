@@ -1,26 +1,29 @@
+"""Alien Wallpaper tests."""
+
 import json
+
 import pytest
-from typing import Any, Optional
 
 import alien_wallpaper
 from alien_wallpaper import Post, Url, __version__
 
 
 def test_version():
+    """Verifies version string is correct."""
     assert __version__ == "0.1.0"
 
 
 class MockPost:
-    def __init__(self, post: Post, filename: Optional[str], json_data):
+    """Mock Post to facilitate testing."""
+
+    def __init__(self, post: Post, json_data):
         self.post = post
-        self.filename = filename
-        self.extension = filename.split(".")[1] if filename is not None else None
         self.json = json.loads(json_data)
 
 
+# pylint: disable=line-too-long
 TEST_POST = MockPost(
     Post("5gfjre", False, Url("http://i.imgur.com/XQgSj3o.jpg")),
-    "5gfjre.jpg",
     """
 {
     "contest_mode": false,
@@ -134,6 +137,7 @@ TEST_POST = MockPost(
 """,
 )
 
+# pylint: disable=line-too-long
 TEST_SELF_POST = MockPost(
     Post(
         "5f9zc4",
@@ -142,7 +146,6 @@ TEST_SELF_POST = MockPost(
             "https://www.reddit.com/r/rust/comments/5f9zc4/whats_everyone_working_on_this_week_422016/"
         ),
     ),
-    None,
     """
 {
     "contest_mode": false,
@@ -209,22 +212,20 @@ TEST_SELF_POST = MockPost(
 )
 
 
-def test_post_from_json():
-    post = alien_wallpaper.Post.from_json(TEST_POST.json)
-    assert post == TEST_POST.post
-
-
-def test_self_post_from_json():
-    post = alien_wallpaper.Post.from_json(TEST_SELF_POST.json)
-    assert post == TEST_SELF_POST.post
+@pytest.mark.parametrize("test_post", [TEST_POST, TEST_SELF_POST])
+def test_image_post_from_json(test_post: MockPost):
+    """Verifies post can be parsed from JSON correctly."""
+    post = alien_wallpaper.Post.from_json(test_post.json)
+    assert post == test_post.post
 
 
 @pytest.mark.large
 def test_download_all_images(tmp_path):
+    """Verifies images can be downloaded."""
     subreddits = [alien_wallpaper.custom_feed_to_url("wolf_blackout", "wallpaper")]
-    n = 1
+    num_images = 1
     out_dir = tmp_path / "output"
     out_dir.mkdir()
 
-    alien_wallpaper.download_all_images(subreddits, n, out_dir)
+    alien_wallpaper.download_all_images(subreddits, num_images, out_dir)
     assert len(list(out_dir.iterdir())) == 1

@@ -4,7 +4,6 @@ import argparse
 import json
 import logging
 import multiprocessing
-import os.path
 import re
 import shutil
 import sys
@@ -33,35 +32,47 @@ Url = NewType("Url", str)
 
 @dataclass
 class Post:
-    id: str
+    """Reddit post."""
+
+    post_id: str
     is_self: bool
     url: Url
 
     @property
-    def is_valid(self) -> bool:
-        return not self.is_self and bool(FILE_EXTENSION_PROG.match(self.url))
-
-    @property
     def filename(self) -> Optional[str]:
+        """Returns image filename if valid."""
         if self.extension is not None:
-            return self.id + "." + self.extension
+            return self.post_id + "." + self.extension
         return None
 
     @property
     def extension(self) -> Optional[str]:
+        """Returns image extension if valid."""
         match = FILE_EXTENSION_PROG.match(self.url)
         if match is not None:
             return match.group(1)
         return None
 
+    def to_image_post(self) -> Optional["ImagePost"]:
+        """Converts post to image post if valid, otherwise returns None."""
+        if self.is_self or not bool(FILE_EXTENSION_PROG.match(self.url)):
+            return None
+
+        return ImagePost(self)
+
     @staticmethod
     def from_json(data) -> "Post":
-        return Post(id=data["id"], is_self=bool(data["is_self"]), url=Url(data["url"]))
+        """Constructs Post from json."""
+        return Post(
+            post_id=data["id"], is_self=bool(data["is_self"]), url=Url(data["url"])
+        )
 
 
 class ImagePost:
+    """Reddit image post."""
+
     def __init__(self, post: Post):
-        self.id = post.id
+        self.post_id = post.post_id
         self.url = post.url
 
         if post.filename is None:
@@ -69,6 +80,7 @@ class ImagePost:
         self.filename = post.filename
 
     def download(self, out_dir: Path):
+        """Downloads image to out_dir."""
         path = out_dir / self.filename
         logging.debug(path)
 
@@ -77,51 +89,66 @@ class ImagePost:
                 path, "wb+"
             ) as out_file:
                 shutil.copyfileobj(response, out_file)
-        except urllib.error.HTTPError as e:
-            logging.exception(e)
+        except urllib.error.HTTPError as ex:
+            logging.exception(ex)
             raise
 
 
-def subreddit_to_url(subreddit: str) -> Url:
-    return Url("https://www.reddit.com/r/{}".format(subreddit))
-
-
 def fetch_image_posts(subreddit: Url, limit=25, after="") -> List[ImagePost]:
+    """Fetches image posts from subreddit."""
     params = urllib.parse.urlencode({"limit": limit, "after": after})
     url = "{}.json?{}".format(subreddit, params)
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     resp = urllib.request.urlopen(req)
     result = json.loads(resp.read().decode("utf-8"))
     posts = [Post.from_json(p["data"]) for p in result["data"]["children"]]
-    return [ImagePost(post) for post in posts if post.is_valid]
+
+    # Avoids walrus operator until black supports it
+    image_posts = []
+    for post in posts:
+        image_post = post.to_image_post()
+        if image_post is not None:
+            image_posts.append(image_post)
+
+    return image_posts
 
 
-def download_images(subreddit_name: Url, n: int, out_dir: Path) -> None:
-    posts = fetch_image_posts(subreddit_name, limit=n)
-    num_images = 0
+def download_images(subreddit_name: Url, num_images: int, out_dir: Path) -> None:
+    """Downloads n images from subreddit_name to out_dir."""
+    posts = fetch_image_posts(subreddit_name, limit=num_images)
+    curr_images = 0
     while True:
         for post in posts:
             post.download(out_dir)
-            num_images += 1
-            if num_images >= n:
+            curr_images += 1
+            if curr_images >= num_images:
                 return
 
-        posts = fetch_image_posts(subreddit_name, limit=n, after=posts[-1].id)
+        posts = fetch_image_posts(
+            subreddit_name, limit=num_images, after=posts[-1].post_id
+        )
 
 
-def download_all_images(subreddits: Sequence[Url], n, out_dir: Path):
+def download_all_images(subreddits: Sequence[Url], num_images: int, out_dir: Path):
     """Download n images in parallel for each subreddit to out_dir."""
     out_dir.mkdir(parents=True, exist_ok=True)
     with multiprocessing.Pool() as pool:
         for subreddit in subreddits:
-            pool.apply(download_images, args=(subreddit, n, out_dir))
+            pool.apply(download_images, args=(subreddit, num_images, out_dir))
+
+
+def subreddit_to_url(subreddit: str) -> Url:
+    """Converts subreddit name to a URL."""
+    return Url(f"https://www.reddit.com/r/{subreddit}")
 
 
 def custom_feed_to_url(user: str, custom_feed_name: str) -> Url:
+    """Converts Reddit Custom Feed to a URL."""
     return Url(f"https://www.reddit.com/user/{user}/m/{custom_feed_name}")
 
 
 def parse_cli_args():
+    """Parses command line arguments."""
     parser = argparse.ArgumentParser(description="Download images from Reddit.")
     parser.add_argument("--subreddits", nargs="*")
     parser.add_argument("--multireddit", nargs="?", help="USER/multi_name")
@@ -131,6 +158,7 @@ def parse_cli_args():
 
 
 def main():
+    """Main entrypoint."""
     args = parse_cli_args()
     logging_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=logging_level)
