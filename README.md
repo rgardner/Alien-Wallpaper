@@ -1,5 +1,7 @@
 # Alien Wallpaper
 
+![Tests Status](https://github.com/rgardner/Alien-Wallpaper/workflows/CI/badge.svg)
+
 Download images from subreddits. Great for beautiful wallpaper. Requires Python
 3.3+.
 
