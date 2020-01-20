@@ -1,6 +1,6 @@
 name: Tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   Linting:
@@ -17,7 +17,7 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
           source "${HOME}/.poetry/env"
       - name: Linting
-        run: invoke lint-ci
+        run: poetry run invoke lint-ci
 
   Testing:
     runs-on: ubuntu-18.04
@@ -31,4 +31,4 @@ jobs:
       - name: Install poetry
         run: tools/ci/install_poetry.sh
       - name: Run Tests
-        run: invoke test
+        run: poetry run invoke test
