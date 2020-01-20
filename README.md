@@ -12,24 +12,24 @@ e.g. `https://www.reddit.com/2zd9do`.
 
 ```bash
 $ alien_wallpaper --help
-usage: alien_wallpaper.py [-h] [--subreddits [SUBREDDITS [SUBREDDITS ...]]]
-                          [--multireddit [MULTIREDDIT]] --out OUT [-v]
+usage: alien_wallpaper [-h] [-s [SUBREDDITS [SUBREDDITS ...]]] [-c [CUSTOM_FEEDS [CUSTOM_FEEDS ...]]] -o OUT [--verbose]
 
 Download images from Reddit.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --subreddits [SUBREDDITS [SUBREDDITS ...]]
-  --multireddit [MULTIREDDIT]
-                        USER/multi_name
-  --out OUT
-  -v, --verbose
+  -s [SUBREDDITS [SUBREDDITS ...]], --subreddits [SUBREDDITS [SUBREDDITS ...]]
+                        One or more subreddits.
+  -c [CUSTOM_FEEDS [CUSTOM_FEEDS ...]], --custom-feeds [CUSTOM_FEEDS [CUSTOM_FEEDS ...]]
+                        One or more custom feeds in the format USER/CUSTOM_FEED_NAME
+  -o OUT, --out OUT     Output directory
+  --verbose
 ```
 
 ## Features
 
 - Can be easily set up to run on a schedule on macOS using `launchctl`
-- Supports downloading images from one or more subreddits, or a multireddit
+- Supports downloading images from subreddits and [Custom Feeds][reddit-custom-feed]
 
 ## Installation
 
@@ -59,3 +59,5 @@ request when the status checks pass.
 1. Download all images that RES can preview.
    - Flickr lightbox.
    - urls without a file extension.
+
+[reddit-custom-feed]: https://www.reddit.com/r/announcements/comments/bpfyx1/introducing_custom_feeds_plus_a_community_contest/

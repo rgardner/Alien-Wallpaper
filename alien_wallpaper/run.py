@@ -149,10 +149,19 @@ def custom_feed_to_url(user: str, custom_feed_name: str) -> Url:
 
 def parse_cli_args():
     """Parses command line arguments."""
-    parser = argparse.ArgumentParser(description="Download images from Reddit.")
-    parser.add_argument("--subreddits", nargs="*")
-    parser.add_argument("--multireddit", nargs="?", help="USER/multi_name")
-    parser.add_argument("--out", required=True, type=Path, help="Output directory")
+    parser = argparse.ArgumentParser(
+        prog="alien_wallpaper", description="Download images from Reddit."
+    )
+    parser.add_argument("-s", "--subreddits", nargs="*", help="One or more subreddits.")
+    parser.add_argument(
+        "-c",
+        "--custom-feeds",
+        nargs="*",
+        help="One or more custom feeds in the format USER/CUSTOM_FEED_NAME",
+    )
+    parser.add_argument(
+        "-o", "--out", required=True, type=Path, help="Output directory"
+    )
     parser.add_argument("--verbose", action="store_true")
     return parser.parse_args()
 
@@ -163,15 +172,17 @@ def main():
     logging_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=logging_level)
 
-    if not args.subreddits and not args.multireddit:
-        subreddits = [subreddit_to_url(s) for s in DEFAULT_SUBREDDITS]
-    else:
-        subreddits = []
-        if args.subreddits:
-            subreddits.extend([subreddit_to_url(s) for s in args.subreddits])
+    reddit_urls = []
+    if args.subreddits:
+        reddit_urls.extend([subreddit_to_url(s) for s in args.subreddits])
 
-        if args.multireddit:
-            user, multi = args.multireddit.split("/")
-            subreddits.append(custom_feed_to_url(user, multi))
+    if args.custom_feeds:
+        for feed in args.custom_feeds:
+            user, multi = feed.split("/")
+            reddit_urls.append(custom_feed_to_url(user, multi))
 
-    download_all_images(subreddits, IMAGES_PER_SUBREDDIT, args.out)
+    # if user doesn't specify any Reddit URLs, use the defaults
+    if not reddit_urls:
+        reddit_urls = [subreddit_to_url(s) for s in DEFAULT_SUBREDDITS]
+
+    download_all_images(reddit_urls, IMAGES_PER_SUBREDDIT, args.out)

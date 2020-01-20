@@ -27,8 +27,7 @@ def install():
     # first uninstall to unload launch agent
     uninstall()
 
-    # subreddits = input("subreddits (comma-separated): ")
-    multireddit = input("multireddit (USERNAME/MULTINAME): ")
+    custom_feed = input("custom feed (USERNAME/CUSTOM_FEED_NAME): ")
     default_pics_dir = Path.home() / "Pictures"
     out = input(f"out (e.g. {default_pics_dir}): ")
 
@@ -36,8 +35,8 @@ def install():
         "/Users/bobgardner/.pyenv/shims/python3",
         "-m",
         "alien_wallpaper",
-        "--multireddit",
-        multireddit,
+        "--custom-feeds",
+        custom_feed,
         "--out",
         out,
     ]
