@@ -74,7 +74,10 @@ def get_launch_agents_dir() -> Path:
 
 def get_agent_log_dir() -> Path:
     """Returns user log directory."""
-    log_root_dir = Path.home() / "Library" / "Logs"
+    log_root_dir = (
+        Path.home() / "Library" / "Logs" / "com.alienwallpaper.alienwallpaper"
+    )
+    log_root_dir.mkdir(parents=True, exist_ok=True)
     assert log_root_dir.is_dir()
     return log_root_dir
 
