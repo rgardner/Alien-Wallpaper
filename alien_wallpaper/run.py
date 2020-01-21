@@ -173,7 +173,6 @@ def parse_cli_args():
 
 
 def main():
-    """Main entrypoint."""
     args = parse_cli_args()
     logging_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=logging_level)

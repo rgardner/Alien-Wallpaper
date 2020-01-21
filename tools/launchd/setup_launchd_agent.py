@@ -176,7 +176,6 @@ def parse_cli_args() -> argparse.Namespace:
 
 
 def main():
-    """Main entrypoint."""
     args = parse_cli_args()
     if args.command == "install":
         install()
