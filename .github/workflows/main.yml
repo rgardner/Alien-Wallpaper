@@ -78,3 +78,6 @@ jobs:
 
       - name: Run Tests
         run: poetry run invoke test
+        env:
+          ALIEN_WALLPAPER_CLIENT_ID: "${{ secrets.ALIEN_WALLPAPER_CLIENT_ID }}"
+          ALIEN_WALLPAPER_SECRET: "${{ secrets.ALIEN_WALLPAPER_SECRET }}"

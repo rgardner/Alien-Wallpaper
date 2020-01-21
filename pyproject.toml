@@ -16,12 +16,13 @@ pylint = "^2.4.4"
 invoke = "^1.4.0"
 pre-commit = "^1.21.0"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
+praw = "^6.5.1"
 
 [tool.poetry.extras]
 launchd = ["toml"]
 
 [tool.poetry.scripts]
-alien_wallpaper = "alien_wallpaper.run:main"
+alien_wallpaper = "alien_wallpaper.console:main"
 
 [tool.black]
 target_version = ["py38"]
