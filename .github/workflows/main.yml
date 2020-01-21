@@ -45,6 +45,7 @@ jobs:
         run: poetry run invoke lint-ci
 
   Testing:
+    needs: Linting
     runs-on: ubuntu-18.04
 
     steps:
