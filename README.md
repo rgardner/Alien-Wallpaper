@@ -12,17 +12,18 @@ e.g. `https://www.reddit.com/2zd9do`.
 
 ```bash
 $ alien_wallpaper --help
-usage: alien_wallpaper [-h] [-s [SUBREDDITS [SUBREDDITS ...]]] [-c [CUSTOM_FEEDS [CUSTOM_FEEDS ...]]] -o OUT [--verbose]
+usage: alien_wallpaper [-h] [-s [SUBREDDITS [SUBREDDITS ...]]]
+                       [-c [CUSTOM_FEEDS [CUSTOM_FEEDS ...]]] -o OUT [--verbose]
 
 Download images from Reddit.
 
 optional arguments:
   -h, --help            show this help message and exit
   -s [SUBREDDITS [SUBREDDITS ...]], --subreddits [SUBREDDITS [SUBREDDITS ...]]
-                        One or more subreddits.
+                        one or more subreddits.
   -c [CUSTOM_FEEDS [CUSTOM_FEEDS ...]], --custom-feeds [CUSTOM_FEEDS [CUSTOM_FEEDS ...]]
-                        One or more custom feeds in the format USER/CUSTOM_FEED_NAME
-  -o OUT, --out OUT     Output directory
+                        one or more custom feeds in the format USER/CUSTOM_FEED_NAME
+  -o OUT, --out OUT     output directory
   --verbose
 ```
 

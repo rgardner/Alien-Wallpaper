@@ -344,6 +344,7 @@ good-names=f,
            i,
            j,
            k,
+           logger,
            ex,
            Run,
            _

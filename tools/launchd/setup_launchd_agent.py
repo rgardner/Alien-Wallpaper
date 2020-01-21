@@ -45,6 +45,7 @@ def generate_launchd_config(config: AlienWallpaperConfig) -> Dict[Any, Any]:
         str(config.python3_path),
         "-m",
         "alien_wallpaper",
+        "--verbose",
         "--out",
         str(config.output_directory),
     ]  # type: List[str]

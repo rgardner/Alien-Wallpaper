@@ -31,6 +31,8 @@ USER_AGENT = "AlienWallpaper by /u/WolfBlackout"
 FILE_EXTENSION_PROG = re.compile(".*.(jpg|jpeg|gif|png)$", re.IGNORECASE)
 Url = NewType("Url", str)
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class Post:
@@ -84,7 +86,7 @@ class ImagePost:
     def download(self, out_dir: Path):
         """Downloads image to out_dir."""
         path = out_dir / self.filename
-        logging.debug(path)
+        logger.debug("Downloading %s to %s", self.filename, path)
 
         try:
             with urllib.request.urlopen(self.url) as response, open(
@@ -92,7 +94,7 @@ class ImagePost:
             ) as out_file:
                 shutil.copyfileobj(response, out_file)
         except urllib.error.HTTPError as ex:
-            logging.exception(ex)
+            logger.exception(ex)
             raise
 
 
@@ -105,7 +107,7 @@ def fetch_image_posts(subreddit: Url, limit=25, after="") -> List[ImagePost]:
     result = json.loads(resp.read().decode("utf-8"))
     posts = [Post.from_json(p["data"]) for p in result["data"]["children"]]
 
-    # Avoids walrus operator until black supports it
+    # Avoid walrus operator until black supports it
     image_posts = []
     for post in posts:
         image_post = post.to_image_post()
