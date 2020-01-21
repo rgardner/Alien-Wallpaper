@@ -45,6 +45,7 @@ jobs:
         run: poetry run invoke lint-ci
 
   Testing:
+    needs: Linting
     runs-on: ubuntu-18.04
 
     steps:
@@ -78,3 +79,6 @@ jobs:
 
       - name: Run Tests
         run: poetry run invoke test
+        env:
+          ALIEN_WALLPAPER_CLIENT_ID: "${{ secrets.ALIEN_WALLPAPER_CLIENT_ID }}"
+          ALIEN_WALLPAPER_CLIENT_SECRET: "${{ secrets.ALIEN_WALLPAPER_CLIENT_SECRET }}"

@@ -1,0 +1,5 @@
+[launchd_config]
+python3-path = "/path/to/python3"
+subreddits = []
+custom-feeds = []
+output-directory = []
