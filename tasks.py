@@ -10,9 +10,12 @@ def run(ctx):
 
 
 @task
-def test(ctx):
+def test(ctx, large=False):
     """Runs tests."""
-    ctx.run("poetry run pytest tests")
+    if large:
+        ctx.run("poetry run pytest tests")
+    else:
+        ctx.run("poetry run pytest tests -m 'not large'")
 
 
 @task

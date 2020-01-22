@@ -1,7 +1,6 @@
 """Responsible for image downloading."""
 
 import logging
-import os
 import re
 import shutil
 import urllib.error
@@ -14,6 +13,8 @@ from typing import Dict, List, Optional, Tuple, Union
 from urllib.error import HTTPError
 
 import praw
+
+from . import settings
 
 USER_AGENT = "AlienWallpaper by /u/WolfBlackout"
 FILE_EXTENSION_PROG = re.compile(".*.(jpg|jpeg|gif|png)$", re.IGNORECASE)
@@ -48,8 +49,8 @@ class ImageDownloader:
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        client_id = os.environ["ALIEN_WALLPAPER_CLIENT_ID"]
-        client_secret = os.environ["ALIEN_WALLPAPER_CLIENT_SECRET"]
+        client_id = settings.get_reddit_client_id()
+        client_secret = settings.get_reddit_client_secret()
         self.reddit = praw.Reddit(
             client_id=client_id, client_secret=client_secret, user_agent=USER_AGENT
         )
