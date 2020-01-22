@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
-"""Helper tool to install Alien Wallpaper as a launchd agent."""
+"""Contains daemon-related functionality."""
 
 import argparse
 import plistlib
 import shutil
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List
@@ -18,28 +16,41 @@ LAUNCHD_PLIST_NAME = "com.alienwallpaper.alienwallpaper.plist"
 
 
 @dataclass
-class AlienWallpaperConfig:
-    """Data object for Alien Wallpaper configuration file."""
+class DaemonConfig:
+    """Data object for configuration file."""
 
-    python3_path: Path
-    subreddits: List[str]
-    custom_feeds: List[str]
-    output_directory: Path
+    python3_path: Path = Path()
+    subreddits: List[str] = field(default_factory=list)
+    custom_feeds: List[str] = field(default_factory=list)
+    output_directory: Path = Path()
 
     @staticmethod
-    def from_config_file(path: Path) -> "AlienWallpaperConfig":
-        """Parse config file into strongly-typed data object."""
-        raw_config = toml.load(path)
-        section = raw_config["launchd_config"]
-        return AlienWallpaperConfig(
-            python3_path=Path(section["python3-path"]),
-            subreddits=section["subreddits"],
-            custom_feeds=section["custom-feeds"],
-            output_directory=Path(section["output-directory"]),
+    def load_toml(path: Path) -> "DaemonConfig":
+        """Parses config file into strongly-typed data object."""
+        config = toml.load(path)
+        return DaemonConfig(
+            python3_path=Path(config["python3_path"]),
+            subreddits=config["subreddits"],
+            custom_feeds=config["custom_feeds"],
+            output_directory=Path(config["output_directory"]),
         )
 
+    def dumps_toml(self) -> str:
+        """Dumps self as toml, converting empty paths to empty strings."""
 
-def generate_launchd_config(config: AlienWallpaperConfig) -> Dict[Any, Any]:
+        def path_to_str(path: Path) -> str:
+            return str(path) if path.parts else ""
+
+        data = {
+            "python3_path": path_to_str(self.python3_path),
+            "subreddits": self.subreddits,
+            "custom_feeds": self.custom_feeds,
+            "output_directory": path_to_str(self.output_directory),
+        }
+        return toml.dumps(data)
+
+
+def generate_launchd_config(config: DaemonConfig) -> Dict[Any, Any]:
     """Generates launchd config that runs the program on a schedule."""
     program_args = [
         str(config.python3_path),
@@ -94,13 +105,12 @@ def get_agent_stderr_log() -> Path:
     return get_agent_log_dir() / "com.alienwallpaper.alienwallpaper.err.log"
 
 
-def install():
+def load_daemon(user_config_file: Path):
     """Installs Alien Wallpaper launchd agent."""
-    # first uninstall to unload launch agent
-    uninstall()
+    # first unload the daemon
+    unload_daemon()
 
-    user_config_file = Path.cwd() / "launchd_config.toml"
-    user_config = AlienWallpaperConfig.from_config_file(user_config_file)
+    user_config = DaemonConfig.load_toml(user_config_file)
 
     agent_config = generate_launchd_config(user_config)
     agent_config_file = get_launch_agents_dir() / LAUNCHD_PLIST_NAME
@@ -125,7 +135,7 @@ def is_launchd_agent_installed() -> bool:
         return False
 
 
-def status():
+def get_daemon_status():
     """Displays status and log file information."""
     is_installed = is_launchd_agent_installed()
 
@@ -146,7 +156,7 @@ def status():
         print(f"Error logs: {error_logs}")
 
 
-def uninstall():
+def unload_daemon():
     """Uninstalls Alien Wallpaper launchd agent."""
     plist = get_launch_agents_dir() / LAUNCHD_PLIST_NAME
     subprocess.run(
@@ -161,29 +171,21 @@ def uninstall():
     shutil.rmtree(get_agent_log_dir())
 
 
-def parse_cli_args() -> argparse.Namespace:
-    """Parses command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Install Alien Wallpaper launchd agent"
-    )
-    parser.add_argument(
-        "command",
-        nargs="?",
-        default="install",
-        choices=("install", "status", "uninstall"),
-    )
-    return parser.parse_args()
+def run_generate_config_command(_args):
+    """Displays default daemon config on stdout."""
+    print(DaemonConfig().dumps_toml())
 
 
-def main():
-    args = parse_cli_args()
-    if args.command == "install":
-        install()
-    elif args.command == "status":
-        status()
-    else:
-        uninstall()
+def run_load_daemon_command(args: argparse.Namespace):
+    """Loads daemon using config file settings."""
+    load_daemon(args.config)
 
 
-if __name__ == "__main__":
-    main()
+def run_unload_daemon_command(_args):
+    """Unloads the daemon and cleans up log files."""
+    unload_daemon()
+
+
+def run_daemon_status_command(_args):
+    """Queries daemon status and displays additional information."""
+    get_daemon_status()
