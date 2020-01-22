@@ -8,7 +8,7 @@ from alien_wallpaper import CustomFeed, __version__
 
 def test_version():
     """Verifies version string is correct."""
-    assert __version__ == "0.1.0"
+    assert __version__ == "1.0.0"
 
 
 @pytest.mark.large
