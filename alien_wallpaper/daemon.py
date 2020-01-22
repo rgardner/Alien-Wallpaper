@@ -4,12 +4,15 @@ import argparse
 import plistlib
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List
 
 import toml
+
+from . import settings
 
 LAUNCHD_LABEL = "com.alienwallpaper.alienwallpaper"
 LAUNCHD_PLIST_NAME = "com.alienwallpaper.alienwallpaper.plist"
@@ -19,7 +22,6 @@ LAUNCHD_PLIST_NAME = "com.alienwallpaper.alienwallpaper.plist"
 class DaemonConfig:
     """Data object for configuration file."""
 
-    python3_path: Path = Path()
     subreddits: List[str] = field(default_factory=list)
     custom_feeds: List[str] = field(default_factory=list)
     output_directory: Path = Path()
@@ -29,7 +31,6 @@ class DaemonConfig:
         """Parses config file into strongly-typed data object."""
         config = toml.load(path)
         return DaemonConfig(
-            python3_path=Path(config["python3_path"]),
             subreddits=config["subreddits"],
             custom_feeds=config["custom_feeds"],
             output_directory=Path(config["output_directory"]),
@@ -42,7 +43,6 @@ class DaemonConfig:
             return str(path) if path.parts else ""
 
         data = {
-            "python3_path": path_to_str(self.python3_path),
             "subreddits": self.subreddits,
             "custom_feeds": self.custom_feeds,
             "output_directory": path_to_str(self.output_directory),
@@ -53,10 +53,11 @@ class DaemonConfig:
 def generate_launchd_config(config: DaemonConfig) -> Dict[Any, Any]:
     """Generates launchd config that runs the program on a schedule."""
     program_args = [
-        str(config.python3_path),
+        sys.executable,
         "-m",
         "alien_wallpaper",
         "--verbose",
+        "download",
         "--out",
         str(config.output_directory),
     ]  # type: List[str]
@@ -72,6 +73,10 @@ def generate_launchd_config(config: DaemonConfig) -> Dict[Any, Any]:
     return {
         "Label": LAUNCHD_LABEL,
         "ProgramArguments": program_args,
+        "EnvironmentVariables": {
+            "ALIEN_WALLPAPER_CLIENT_ID": settings.get_reddit_client_id(),
+            "ALIEN_WALLPAPER_CLIENT_SECRET": settings.get_reddit_client_secret(),
+        },
         "StartCalendarInterval": {"Hour": 17, "Minute": 0},
         "StandardOutPath": str(get_agent_stdout_log()),
         "StandardErrorPath": str(get_agent_stderr_log()),

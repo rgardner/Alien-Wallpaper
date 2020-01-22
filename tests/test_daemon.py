@@ -9,8 +9,7 @@ def test_generate_default_daemon_config():
     default_toml = default_config.dumps_toml()
     assert (
         default_toml
-        == """python3_path = ""
-subreddits = []
+        == """subreddits = []
 custom_feeds = []
 output_directory = ""
 """

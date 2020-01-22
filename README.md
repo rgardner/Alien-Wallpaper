@@ -51,7 +51,7 @@ This project requires Python 3.8\* and [Poetry](https://python-poetry.org/).
 Install dependencies:
 
 ```bash
-poetry install --extras daemon
+poetry install
 ```
 
 ## Contributing
