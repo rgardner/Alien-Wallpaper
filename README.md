@@ -54,6 +54,14 @@ Install dependencies:
 poetry install
 ```
 
+Given this is a personal-use script, `alien_wallpaper` uses the
+[Application-Only (Client Credentials)](https://praw.readthedocs.io/en/v6.5.1/getting_started/authentication.html#application-only-client-credentials)
+form of authentication. To use this script:
+
+1. [Register the application with Reddit](https://www.reddit.com/prefs/apps/)
+2. Set the `ALIEN_WALLPAPER_CLIENT_ID` environment variable to the app's client ID
+3. Set the `ALIEN_WALLPAPER_CLIENT_SECRET` environment variable to the app's client secret
+
 ## Contributing
 
 This project uses [pre-commit](https://pre-commit.com/) for git pre-commit
