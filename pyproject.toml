@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "alien-wallpaper"
-version = "0.1.0"
+version = "1.0.0"
 description = "Download images from Reddit."
 authors = ["Bob Gardner <bob.hn.gardner@gmail.com>"]
 
