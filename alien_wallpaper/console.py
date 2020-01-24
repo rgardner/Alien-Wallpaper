@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from typing import List
 
 from . import daemon
 from .image_downloader import CustomFeed, ImageDownloader
@@ -79,22 +80,22 @@ def add_daemon_arg_parser(subparsers):
     status_parser.set_defaults(func=daemon.run_daemon_status_command)
 
 
-def parse_cli_args():
+def parse_cli_args(args: List[str]):
     """Parses command line arguments."""
     parser = argparse.ArgumentParser(
         prog="alien_wallpaper", description="Download images from Reddit."
     )
     parser.add_argument("--verbose", action="store_true")
 
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest="cmd", required=True)
     add_download_arg_parser(subparsers)
     add_daemon_arg_parser(subparsers)
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():
-    args = parse_cli_args()
+    args = parse_cli_args(sys.argv[1:])
     logging_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=logging_level)
 
