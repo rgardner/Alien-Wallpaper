@@ -117,7 +117,7 @@ class ImageDownloader:
             ) as out_file:
                 shutil.copyfileobj(response, out_file)
         except urllib.error.HTTPError as ex:
-            logger.exception(ex)
+            logger.exception("Failed to download %s due to %s", post.id, ex.strerror)
             raise
 
     def _download_images_from_feed(
