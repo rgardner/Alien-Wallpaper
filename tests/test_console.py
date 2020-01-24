@@ -12,3 +12,10 @@ def test_parse_cli_args_when_called_with_no_args_fails(capsys):
         console.parse_cli_args(raw_args)
     output = capsys.readouterr().err
     assert "the following arguments are required: cmd" in output
+
+
+def test_parse_cli_args_when_called_with_short_v_returns_verbose():
+    """Verifies parse_cli_args when called with -v is the same as --verbose."""
+    raw_args = ["-v", "download", "--out", "output"]
+    args = console.parse_cli_args(raw_args)
+    assert args.verbose
