@@ -85,7 +85,7 @@ def parse_cli_args(args: List[str]):
     parser = argparse.ArgumentParser(
         prog="alien_wallpaper", description="Download images from Reddit."
     )
-    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
 
     subparsers = parser.add_subparsers(dest="cmd", required=True)
     add_download_arg_parser(subparsers)
