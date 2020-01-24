@@ -9,6 +9,8 @@ from typing import List
 from . import daemon
 from .image_downloader import CustomFeed, ImageDownloader
 
+LOG_FORMAT = "%(levelname)s|%(asctime)s|%(message)s"
+
 DEFAULT_SUBREDDITS = [
     "ArchitecturePorn",
     "CityPorn",
@@ -18,7 +20,7 @@ DEFAULT_SUBREDDITS = [
     "winterporn",
     "quoteporn",
 ]
-IMAGE_DOWNLOAD_LIMIT = 25
+IMAGE_DOWNLOAD_LIMIT = 1
 
 
 def run_download_images_command(args: argparse.Namespace):
@@ -97,7 +99,7 @@ def parse_cli_args(args: List[str]):
 def main():
     args = parse_cli_args(sys.argv[1:])
     logging_level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(stream=sys.stdout, level=logging_level)
+    logging.basicConfig(format=LOG_FORMAT, stream=sys.stdout, level=logging_level)
 
     # Run subcommand
     args.func(args)
