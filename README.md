@@ -3,7 +3,7 @@
 ![Tests Status](https://github.com/rgardner/Alien-Wallpaper/workflows/CI/badge.svg)
 
 Download images from subreddits. Great for beautiful wallpaper. Requires Python
-3.8+.
+3.10+.
 
 ```bash
 # Download images from default subreddits to output directory
@@ -46,7 +46,7 @@ $ alien_wallpaper daemon unload
 
 ## Installation
 
-This project requires Python 3.8\* and [Poetry](https://python-poetry.org/).
+This project requires Python 3.10\* and [Poetry](https://python-poetry.org/).
 
 Install dependencies:
 
