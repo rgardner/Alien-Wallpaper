@@ -73,9 +73,6 @@ Running the test suite:
 invoke test
 ```
 
-Use the `automerge` label on your Pull Request to automatically merge the pull
-request when the status checks pass.
-
 ## Future Improvements
 
 1. Download all images that RES can preview.

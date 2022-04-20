@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-ALL_PLATFORMS = set("darwin linux win32".split())
+ALL_PLATFORMS = {"darwin", "linux", "win32"}
 
 
 def pytest_runtest_setup(item):
@@ -14,4 +14,4 @@ def pytest_runtest_setup(item):
     )
     plat = sys.platform
     if supported_platforms and plat not in supported_platforms:
-        pytest.skip("cannot run on platform {}".format(plat))
+        pytest.skip(f"cannot run on platform {plat}")

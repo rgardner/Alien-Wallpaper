@@ -6,17 +6,17 @@ authors = ["Bob Gardner <bob.hn.gardner@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-toml = "^0.10.0"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-black = "^19.10b0"
-mypy = "^0.761"
-pylint = "^2.4.4"
-invoke = "^1.4.0"
-pre-commit = "^1.21.0"
-isort = {version = "^4.3.21", extras = ["pyproject"]}
-praw = "^6.5.1"
+pytest = "^7.1.1"
+black = "^22.3.00"
+mypy = "^0.942"
+pylint = "^2.13.7"
+invoke = "^1.7.0"
+pre-commit = "^2.18.1"
+isort = "^5.10.1"
+praw = "^7.5.0"
 
 [tool.poetry.scripts]
 alien_wallpaper = "alien_wallpaper.console:main"
