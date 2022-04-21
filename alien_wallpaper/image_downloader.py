@@ -46,6 +46,7 @@ class ImageDownloader:
     """Downloads images from Reddit."""
 
     def __init__(self, output_dir: Path):
+        """Creates a new image downloader."""
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
