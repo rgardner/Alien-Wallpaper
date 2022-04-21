@@ -65,11 +65,12 @@ form of authentication. To use this script:
 ## Contributing
 
 This project uses [pre-commit](https://pre-commit.com/) for git pre-commit
-hook management. Run `invoke setup` to configure them.
+hook management.
 
 Running the test suite:
 
 ```sh
+poetry shell
 invoke test
 ```
 
